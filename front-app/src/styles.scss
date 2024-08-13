@@ -1,0 +1,52 @@
+@import '~bootstrap/dist/css/bootstrap.min.css';
+html,body{
+  height: 100%;
+}
+
+.footer{
+  position: sticky;
+  top: 100%;
+}
+
+.btn{
+  box-shadow: 0px 9px 15px  rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+  box-shadow: 0px 15px 20px rgba(17, 0, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.active{
+  border-bottom: 3px solid #d1a63980;
+}
+
+.nav-item{
+  margin-right: 2px;
+}
+
+#nav-mes-paris{
+  &:not(.active):hover {
+    border-bottom: 3px solid #1100ff;
+  }
+}
+
+#nav-mes-notifications{
+  &:not(.active):hover {
+    border-bottom: 3px solid #1100ff;
+  }
+}
+
+#nav-mon-compte{
+  &:not(.active):hover {
+    border-bottom: 3px solid #1100ff;
+  }
+}
+
+#nav-admin{
+  &:not(.active):hover {
+    border-bottom: 3px solid #1100ff;
+  }
+}
+
+

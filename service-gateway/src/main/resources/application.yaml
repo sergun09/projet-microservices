@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: service-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Authorization Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            maxAge: 3600
+      routes:
+        - id: rewrite_authentification_route
+          uri: lb://service-authentification
+          predicates:
+            - Path=/api/authentification/**
+          filters:
+            - RewritePath=/api/authentification(?<segment>/?.*), /authentification$\{segment}
+        - id: rewrite_evenement_route
+          uri: lb://service-evenement
+          predicates:
+            - Path=/api/evenement/**
+          filters:
+            - RewritePath=/api/evenement(?<segment>/?.*), /evenement$\{segment}
+        - id: rewrite_notification_route
+          uri: lb://service-notification
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - RewritePath=/api/notifications(?<segment>/?.*), /notifications$\{segment}
+        - id: rewrite_paiement_route
+          uri: lb://service-paiement
+          predicates:
+            - Path=/api/paiement/**
+          filters:
+            - RewritePath=/api/paiement(?<segment>/?.*), /paiement$\{segment}
+        - id: rewrite_pari_route
+          uri: lb://service-pari
+          predicates:
+            - Path=/api/paris/**
+          filters:
+            - RewritePath=/api/paris(?<segment>/?.*), /paris$\{segment}
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        register: true
+      ribbon:
+        enabled: false
+

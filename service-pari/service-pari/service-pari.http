@@ -1,0 +1,98 @@
+### Connexion d'un utilisateur
+POST http://localhost:8081/authentification/login
+Content-Type: application/json
+
+{
+  "email": "u1@test.com",
+  "mdpUtilisateur": "user1"
+}
+
+> {%
+    client.global.set("tokenUser", response.headers.valueOf("Authorization"));
+%}
+
+### Connexion d'un admin
+POST http://localhost:8081/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+
+
+### R�cup�rer tous les paris en tant qu'utilisateur | Pagination | 403 Forbidden
+GET http://localhost:8082/paris?pageIndex=1&pageSize=10
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### R�cup�rer tous les paris en tant qu'admin | Pagination | 200 OK
+GET http://localhost:8082/paris?pageIndex=1&pageSize=10
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+### R�cup�rer tous les paris d'un utilisateur | Pagination | 200 OK
+GET http://localhost:8082/paris/utilisateurs?pageIndex=1&pageSize=10
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+### R�cup�rer un pari sp�cifique | 200
+GET http://localhost:8082/paris/2
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### R�cup�rer un pari sp�cifique d'un autre user | 403 Forbidden
+GET http://localhost:8082/paris/6
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### R�cup�rer un pari inexistant | 404 Not Found
+GET http://localhost:8082/paris/90
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### Supression d'un pari
+DELETE http://localhost:8082/paris/2
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### Supression d'un pari qui n'est pas le sien
+DELETE http://localhost:8082/paris/6
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### Supression d'un pari inexistant
+DELETE http://localhost:8082/paris/15
+Authorization: {{tokenUser}}
+Accept: application/json
+
+############################################################################################################################
+
+###
+GET http://localhost:8082/rabbitmq
+Authorization: {{tokenUser}}
+Accept: application/json
+
+### R�cup�rer le nombre de paris pour chaque �v�nement
+
+GET http://localhost:8082/paris/evenements
+Authorization: {{tokenAdmin}}
+
+###
+POST http://localhost:8082/paris
+Authorization: {{tokenUser}}
+Content-Type: application/json
+
+{
+  "evenementId": 4,
+  "transactionId": 0,
+  "mise": 30.50,
+  "prediction": "Nul"
+}
+
+###

@@ -1,0 +1,72 @@
+version: '2'
+
+services:
+  evenement:
+    build:
+      context: .
+      dockerfile: Dockerfile-evenement
+    container_name: evenement
+    depends_on:
+      - db
+      - discovery
+      - authent
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/evenement-postgres
+      - SPRING_DATASOURCE_USERNAME=evenement-postgres
+      - SPRING_DATASOURCE_PASSWORD=evenement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovsery
+      - CONSUL_PORT=8500
+    ports:
+      - "8083:8083"
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "9000:8080"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+
+  discovery:
+    image: consul:1.15
+    ports:
+      - 8500:8500
+
+  authent:
+    build:
+      context: .
+      dockerfile: Dockerfile-authent
+    container_name: authent
+    depends_on:
+      - discovery
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8081:8081"

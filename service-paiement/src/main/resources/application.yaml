@@ -1,0 +1,35 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: service-paiement
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        register: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: guest
+    password: guest
+
+    exchange-inscription: utilisateur.nouveau
+    queue-inscription: utilisateur.nouveau.paiement.confirmation
+    routingkey-inscription: utilisateur.nouveau
+
+    exchange-pari-gagne: pari.gagne
+    queue-pari-gagne: pari.gagne.paiement.confirmation
+    routingkey-pari-gagne: pari.gagne
+
+    exchange-pari-annule: pari.annule
+    queue-pari-annule: pari.annule.paiement.confirmation
+    routingkey-pari-annule: pari.annule
+
+    exchange-paiement-nouveau: paiement.nouveau
+    queue-paiement-nouveau: paiement.nouveau
+    routingkey-paiement-nouveau: paiement.nouveau
+
+

@@ -1,0 +1,45 @@
+<div class="container">
+    <h2 class="text-center mt-3">Se connecter</h2>
+  <form class="text-center" [formGroup]="form" (ngSubmit)="handleSubmit()">
+    <div class="form-group mx-auto w-25">
+      <input
+        type="url"
+        formControlName="email"
+        class="form-control"
+        [class.is-invalid]="
+            form.get('email')?.invalid && submitted
+          "
+        placeholder="email"
+      />
+      <div class="invalid-feedback" *ngIf="form.get('email')?.invalid && submitted">
+        <span *ngIf="form.get('email')?.hasError('required')">
+          L'email est obligatoire
+        </span>
+        <span *ngIf="form.get('email')?.hasError('email')">
+         Email au format invalide
+        </span>
+      </div>
+    </div>
+    <div class="form-group mx-auto mt-1 w-25">
+      <input
+        type="password"
+        formControlName="mdpUtilisateur"
+        class="form-control"
+        [class.is-invalid]="
+            form.get('mdpUtilisateur')?.invalid && submitted
+          "
+        placeholder="Mot de passe"
+      />
+      <div class="invalid-feedback" *ngIf="form.get('mdpUtilisateur')?.invalid && submitted">
+        Le mot de passe est obligatoire
+      </div>
+    </div>
+    <div class="alert alert-danger mt-1 sm" *ngIf="errorMessages.length>0">
+      <p *ngFor="let errorMessage of errorMessages">{{errorMessage}}</p>
+    </div>
+    <button type="submit" class="btn btn-warning mt-2">Connexion</button>
+    <div class="text-center justify-content-center mt-2">
+      <p> Vous n'avez pas de compte ? <a routerLink="/inscription" class="link-primary">S'inscrire</a></p>
+    </div>
+  </form>
+</div>

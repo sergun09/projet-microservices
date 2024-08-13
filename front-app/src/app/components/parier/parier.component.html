@@ -1,0 +1,55 @@
+<div class="container">
+    <h1 class="text-center mt-2">Parier sur un évènement</h1>
+    <form *ngIf="evenement" [style.display]="!register ? 'block' : 'none'">
+        <div class="form-group">
+            <label class="control-label">Equipe 1</label>
+            <input #equipe1 type="text" class="form-control" [value]="evenement.equipe1" disabled>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Equipe 2</label>
+            <input type="text" class="form-control" [value]="evenement.equipe2" disabled>
+        </div>
+        <div class="form-group">
+            <label class="control-label">type d'évènement</label>
+            <input class="form-control" type="text" [value]="evenement.nomTypeEvenement" disabled>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Date</label>
+            <input class="form-control" type="text" [value]="evenement.dateEvenement" disabled>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Lieu</label>
+            <input class="form-control" type="text" [value]="evenement.ville" disabled>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">cote equipe 1</label>
+            <input class="form-control" type="text" [value]="evenement.coteEquipe1">
+            <input class="form-control" type="text" [value]="evenement.coteEquipe2">
+            <input class="form-control" type="text" [value]="evenement.coteNul">
+        </div>
+
+        <div class="mt-1 col-lg-7 d-flex">
+            <p class="mx-2">Resultat : <p>
+            <select name="vistoire" id="victoire" [(ngModel)]="resultat" class="form-control">
+                <option value="{{evenement.equipe1}}">{{evenement.equipe1 }} </option>
+                <option value="{{evenement.equipe2}}">{{evenement.equipe2 }}</option>
+                <option  value="nul">resultat nul</option>
+            </select>
+        </div>
+
+        <div class="alert alert-danger mt-1" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </div>
+
+        <button (click)="onSavePari()"
+                type="button" class="btn btn-warning mt-1">Je valide</button>
+    </form>
+    <div  *ngIf="register" class="text-center justify-content-center mt-2">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Enregistrement ...</p>
+    </div>
+</div>
+

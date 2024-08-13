@@ -1,0 +1,179 @@
+version: '2'
+
+services:
+  authent:
+    build: ../service-authentification
+    container_name: service-authentification
+    restart: always
+    depends_on:
+      - discovery
+      - db-authent
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-authent:5432/authent-postgres
+      - SPRING_DATASOURCE_USERNAME=authent-postgres
+      - SPRING_DATASOURCE_PASSWORD=authent-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8081:8081"
+
+  db-authent:
+    image: 'postgres:13.1-alpine'
+    container_name: db-authent
+    environment:
+      - POSTGRES_USER=authent-postgres
+      - POSTGRES_PASSWORD=authent-postgres
+
+  notif:
+    build: ../service-notification
+    container_name: service-notification
+    restart: always
+    depends_on:
+      - db-notif
+      - discovery
+      - authent
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notif:5432/notif-postgres
+      - SPRING_DATASOURCE_USERNAME=notif-postgres
+      - SPRING_DATASOURCE_PASSWORD=notif-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8085:8085"
+
+  db-notif:
+    image: 'postgres:13.1-alpine'
+    container_name: db-notif
+    environment:
+      - POSTGRES_USER=notif-postgres
+      - POSTGRES_PASSWORD=notif-postgres
+
+  evenement:
+    build: ../service-evenement
+    container_name: service-evenement
+    restart: always
+    depends_on:
+      - db-evenement
+      - discovery
+      - authent
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-evenement:5432/evenement-postgres
+      - SPRING_DATASOURCE_USERNAME=evenement-postgres
+      - SPRING_DATASOURCE_PASSWORD=evenement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovsery
+      - CONSUL_PORT=8500
+    ports:
+      - "8083:8083"
+
+  db-evenement:
+    image: 'postgres:13.1-alpine'
+    container_name: db-evenement
+    environment:
+      - POSTGRES_USER=evenement-postgres
+      - POSTGRES_PASSWORD=evenement-postgres
+
+  paiement:
+    build: ../service-paiement
+    container_name: service-paiement
+    restart: always
+    depends_on:
+      - discovery
+      - authent
+      - db-paiement
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-paiement:5432/paiement-postgres
+      - SPRING_DATASOURCE_USERNAME=paiement-postgres
+      - SPRING_DATASOURCE_PASSWORD=paiement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8084:8084"
+
+  db-paiement:
+    image: 'postgres:13.1-alpine'
+    container_name: db-paiement
+    environment:
+      - POSTGRES_USER=paiement-postgres
+      - POSTGRES_PASSWORD=paiement-postgres
+
+  service-pari:
+    image: sinanzzz/service-pari:1.0
+    container_name: service-pari-api
+    ports:
+      - "8082:8082"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8082
+    depends_on:
+      - service-pari-database
+      - discovery
+      - rabbitmq
+      - authent
+
+  service-pari-database:
+    image: postgres:13.1-alpine
+    container_name: service-pari-database
+    environment:
+      - POSTGRES_DB=Bet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+  service-gateway:
+    build: ../service-gateway
+    container_name: service-gateway
+    ports:
+      - 8080:8080
+    environment:
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+      - DEBUG=true
+    depends_on:
+      - discovery
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+
+  discovery:
+    container_name: discovery
+    image: consul:1.15
+    ports:
+      - 8500:8500

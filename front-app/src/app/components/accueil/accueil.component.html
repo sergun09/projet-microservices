@@ -1,0 +1,51 @@
+<div class="container mt-2">
+  <h2 class="text-center">Prenez des décisions éclairées et maximiser vos <i><strong>gains</strong>.</i></h2>
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button [class.active]="selectedTypeEvenement===null" class="nav-link" (click)="resetFilter()" id="pills-home-tab-tous" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">Tous</button>
+    </li>
+    <li *ngFor="let typeEvenement of listTypesEvenement" class="nav-item" role="presentation">
+      <button [class.active]="selectedTypeEvenement===typeEvenement" class="nav-link" (click)="onFilterByTypeEvenement(typeEvenement)" id="pills-home-tab-{{typeEvenement}}" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">{{typeEvenement}}</button>
+    </li>
+  </ul>
+  <div *ngIf="ready && selectedEvenement.items.length>0"  class="d-flex flex-wrap align-items-center">
+    <div *ngFor="let evenement of selectedEvenement.items" class="card m-1 text-center">
+      <div class="card-header">
+        Évènement de type : {{evenement.typeEvenement.nomTypeEvenement}}
+      </div>
+      <div class="card-body">
+        <h5 id="equipe_card" class="card-title text-white">{{evenement.equipe1}} vs {{evenement.equipe2}}</h5>
+        <h6 class="card-title">le {{evenement.dateEvenement.replace('T',' à ').slice(0,18)}}</h6>
+        <h6 class="card-title"><i>Lieu : {{evenement.ville}}</i></h6>
+        <p class="card-text">Pariez au sport et tentez de décrocher <strong>le jackpot</strong></p>
+        <a *ngIf="evenement.typeResultat===null" routerLink="parier/{{evenement.idEvenement}}" class="btn btn-primary">JE PARIE</a>
+        <p *ngIf="evenement.typeResultat!==null" class="text-secondary">EVENEMENT TERMINÉ</p>
+      </div>
+      <div *ngIf="estConnecte" class="card-footer text-muted">
+        <strong>{{nbParisByEvenement.get(evenement.idEvenement) ? nbParisByEvenement.get(evenement.idEvenement) : 0}} </strong> paris {{evenement.typeResultat===null ? 'en cours':''}}
+      </div>
+    </div>
+  </div>
+  <ul *ngIf="ready && selectedEvenement.items.length>0 && evenements.totalPages>1" class="nav nav-pills">
+    <li *ngFor="let item of [].constructor(evenements.totalPages); let page=index">
+      <a [ngClass]="page==currentPage?'btn-info':'btn-outline-info'" (click)="gotoPage(page)" class="btn  ms-1 mt-1">{{page+1}}</a>
+    </li>
+  </ul>
+
+  <div *ngIf="ready && selectedEvenement.items.length<=0" class="row">
+    <div class="col-md-12">
+      <div class="alert alert-warning">
+        <strong>Resultat des paris</strong>
+        <br>
+        <p>Il n'y a aucun pari <i><strong>{{selectedTypeEvenement}}</strong></i> en cours</p>
+      </div>
+    </div>
+  </div>
+
+  <div  *ngIf="!ready" class="text-center justify-content-center mt-2">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Chargement ...</p>
+  </div>
+
+</div>
+

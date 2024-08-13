@@ -1,0 +1,68 @@
+<div class="container">
+  <h1 class="text-center mt-2">{{ evenement.typeResultat == null ? 'Saisir' : 'Consulter' }} le resultat</h1>
+  <form *ngIf="evenement !== null" [style.display]="!register ? 'block' : 'none'">
+    <div class="form-group">
+      <label class="control-label">Equipe 1</label>
+      <input type="text" class="form-control" [value]="evenement.equipe1" disabled>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Equipe 2</label>
+      <input type="text" class="form-control" [value]="evenement.equipe2" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">cote equipe 1</label>
+      <input class="form-control" type="text" [value]="evenement.coteEquipe1" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">cote equipe 2</label>
+      <input class="form-control" type="text" [value]="evenement.coteEquipe2" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">cote Nul</label>
+      <input class="form-control" type="text" [value]="evenement.coteNul" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Date</label>
+      <input class="form-control" type="text" [value]="evenement.dateEvenement" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Lieu</label>
+      <input class="form-control" type="text" [value]="evenement.ville" disabled>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">type d'évènement</label>
+      <input class="form-control" type="text" [value]="evenement.nomTypeEvenement" disabled>
+    </div>
+
+
+    <div  class="mt-1 col-lg-7 d-flex">
+      <p class="mx-2">Resultat : {{evenement.typeResultat!== null ? evenement.typeResultat:''}}<p>
+      <select *ngIf="evenement.typeResultat==null" name="resultat" id="resultat" [(ngModel)]="resultat" class="form-control">
+        <option value="Equipe1">Equipe1</option>
+        <option value="Equipe2">Equipe2</option>
+        <option value="Nul">Resultat nul</option>
+      </select>
+    </div>
+
+    <div class="alert alert-danger mt-1" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <button *ngIf="evenement.typeResultat == null" (click)="onSaveResultat()"
+            type="button" class="btn btn-warning mt-1">Je valide</button>
+
+  </form>
+  <div *ngIf="evenement.typeResultat !== null"  class="text-center justify-content-center mt-2">
+    <a routerLink="/admin" class="link-primary">Retour à la liste des évènements</a>
+  </div>
+  <div  *ngIf="register" class="text-center justify-content-center mt-2">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Enregistrement ...</p>
+  </div>
+</div>

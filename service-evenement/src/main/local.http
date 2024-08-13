@@ -1,0 +1,96 @@
+GET http://localhost:8083/actuator/health
+
+
+### Connexion d'un admin
+POST http://localhost:8081/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+###
+GET http://localhost:8083/evenement/test
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8083/evenement/test/admin
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8083/evenement/test/infos
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+### Création d'un nouvel evenement sportif
+POST http://localhost:8083/evenement
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+{
+  "nomTypeEvenement": "Foot",
+  "equipe1": "PSG",
+  "equipe2": "Juventus",
+  "dateEvenement": "2024-04-23T18:25",
+  "ville": "Barcelonaaa",
+  "coteEquipe1": 2.0,
+  "coteEquipe2": 1.5,
+  "coteNul": 1
+}
+
+> {%
+    client.global.set("urlEvenementSportif", response.headers.valueOf("Location"));
+    console.log(response.headers.valueOf("Location"))
+%}
+
+### Get un evenement sportif
+GET {{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+### Supprimer un evenement sportif
+DELETE {{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+### Modifier un evenement sportif
+PATCH {{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "nomTypeEvenement": "Foot",
+  "equipe1": "Real",
+  "equipe2": "Barca",
+  "dateEvenement": "2012-04-23T18:25:43.511Z",
+  "ville": "Barcelona",
+  "coteEquipe1": 2.0,
+  "coteEquipe2": 1.5,
+  "coteNul": 1
+}
+
+### Modifier le résultat d'un evenement sportif
+PATCH http://localhost:8083/evenement/1/resultat
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "typeResultat": "Equipe2"
+}
+
+### Consultation des evenements sportifs par pagination
+GET http://localhost:8083/evenement?page=0&size=3
+Accept: application/json
+Authorization: {{tokenAdmin}}

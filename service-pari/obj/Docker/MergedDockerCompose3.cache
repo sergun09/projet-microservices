@@ -1,0 +1,290 @@
+name: dockercompose9711869641838832963
+services:
+  authent:
+    build:
+      context: C:\Users\ergun\Desktop\groupe9-microservices\service-authentification
+      dockerfile: Dockerfile
+    container_name: service-authentification
+    depends_on:
+      db-authent:
+        condition: service_started
+        required: true
+      discovery:
+        condition: service_started
+        required: true
+      rabbitmq:
+        condition: service_started
+        required: true
+    environment:
+      CONSUL_HOST: discovery
+      CONSUL_PORT: "8500"
+      DEBUG: "true"
+      JAVA_TOOL_OPTIONS: ' -DCONSUL_HOST=discovery -DCONSUL_PORT=8500'
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      SPRING_DATASOURCE_PASSWORD: authent-postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-authent:5432/authent-postgres
+      SPRING_DATASOURCE_USERNAME: authent-postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8081
+        published: "8081"
+        protocol: tcp
+    restart: always
+  db-authent:
+    container_name: db-authent
+    environment:
+      POSTGRES_PASSWORD: authent-postgres
+      POSTGRES_USER: authent-postgres
+    image: postgres:13.1-alpine
+    networks:
+      default: null
+  db-evenement:
+    container_name: db-evenement
+    environment:
+      POSTGRES_PASSWORD: evenement-postgres
+      POSTGRES_USER: evenement-postgres
+    image: postgres:13.1-alpine
+    networks:
+      default: null
+  db-notif:
+    container_name: db-notif
+    environment:
+      POSTGRES_PASSWORD: notif-postgres
+      POSTGRES_USER: notif-postgres
+    image: postgres:13.1-alpine
+    networks:
+      default: null
+  db-paiement:
+    container_name: db-paiement
+    environment:
+      POSTGRES_PASSWORD: paiement-postgres
+      POSTGRES_USER: paiement-postgres
+    image: postgres:13.1-alpine
+    networks:
+      default: null
+  discovery:
+    container_name: discovery
+    image: consul:1.15
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8500
+        published: "8500"
+        protocol: tcp
+  evenement:
+    build:
+      context: C:\Users\ergun\Desktop\groupe9-microservices\service-evenement
+      dockerfile: Dockerfile
+    container_name: service-evenement
+    depends_on:
+      authent:
+        condition: service_started
+        required: true
+      db-evenement:
+        condition: service_started
+        required: true
+      discovery:
+        condition: service_started
+        required: true
+      rabbitmq:
+        condition: service_started
+        required: true
+    environment:
+      CONSUL_HOST: discovsery
+      CONSUL_PORT: "8500"
+      DEBUG: "true"
+      JAVA_TOOL_OPTIONS: ' -DCONSUL_HOST=discovery -DCONSUL_PORT=8500'
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      SPRING_DATASOURCE_PASSWORD: evenement-postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-evenement:5432/evenement-postgres
+      SPRING_DATASOURCE_USERNAME: evenement-postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8083
+        published: "8083"
+        protocol: tcp
+    restart: always
+  notif:
+    build:
+      context: C:\Users\ergun\Desktop\groupe9-microservices\service-notification
+      dockerfile: Dockerfile
+    container_name: service-notification
+    depends_on:
+      authent:
+        condition: service_started
+        required: true
+      db-notif:
+        condition: service_started
+        required: true
+      discovery:
+        condition: service_started
+        required: true
+      rabbitmq:
+        condition: service_started
+        required: true
+    environment:
+      CONSUL_HOST: discovery
+      CONSUL_PORT: "8500"
+      DEBUG: "true"
+      JAVA_TOOL_OPTIONS: ' -DCONSUL_HOST=discovery -DCONSUL_PORT=8500'
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      SPRING_DATASOURCE_PASSWORD: notif-postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-notif:5432/notif-postgres
+      SPRING_DATASOURCE_USERNAME: notif-postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8085
+        published: "8085"
+        protocol: tcp
+    restart: always
+  paiement:
+    build:
+      context: C:\Users\ergun\Desktop\groupe9-microservices\service-paiement
+      dockerfile: Dockerfile
+    container_name: service-paiement
+    depends_on:
+      authent:
+        condition: service_started
+        required: true
+      db-paiement:
+        condition: service_started
+        required: true
+      discovery:
+        condition: service_started
+        required: true
+      rabbitmq:
+        condition: service_started
+        required: true
+    environment:
+      CONSUL_HOST: discovery
+      CONSUL_PORT: "8500"
+      DEBUG: "true"
+      JAVA_TOOL_OPTIONS: ' -DCONSUL_HOST=discovery -DCONSUL_PORT=8500'
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: "5672"
+      SPRING_DATASOURCE_PASSWORD: paiement-postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-paiement:5432/paiement-postgres
+      SPRING_DATASOURCE_USERNAME: paiement-postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8084
+        published: "8084"
+        protocol: tcp
+    restart: always
+  rabbitmq:
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_PASSWORD: guest
+      RABBITMQ_DEFAULT_USER: guest
+    image: rabbitmq:3-management-alpine
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 15672
+        published: "15672"
+        protocol: tcp
+      - mode: ingress
+        target: 5672
+        published: "5672"
+        protocol: tcp
+  service-gateway:
+    build:
+      context: C:\Users\ergun\Desktop\groupe9-microservices\service-gateway
+      dockerfile: Dockerfile
+    container_name: service-gateway
+    depends_on:
+      discovery:
+        condition: service_started
+        required: true
+    environment:
+      CONSUL_HOST: discovery
+      CONSUL_PORT: "8500"
+      DEBUG: "true"
+      JAVA_TOOL_OPTIONS: ' -DCONSUL_HOST=discovery -DCONSUL_PORT=8500'
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+  service-pari:
+    container_name: service-pari-api
+    depends_on:
+      authent:
+        condition: service_started
+        required: true
+      discovery:
+        condition: service_started
+        required: true
+      rabbitmq:
+        condition: service_started
+        required: true
+      service-pari-database:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: sinanzzz/service-pari:1.0
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8082
+        published: "8082"
+        protocol: tcp
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: C:\Users\ergun\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: C:\Users\ergun\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind:
+          create_host_path: true
+  service-pari-database:
+    container_name: service-pari-database
+    environment:
+      POSTGRES_DB: Bet
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    image: postgres:13.1-alpine
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+networks:
+  default:
+    name: dockercompose9711869641838832963_default

@@ -1,0 +1,51 @@
+<div class="container">
+  <h1 class="text-center mt-2">Parier sur un évènement</h1>
+  <div *ngIf="isPariCreated" class="alert alert-success" role="alert">
+    <p *ngIf="isPariCreated"  class="justify-content-center text-center">Le pari a bien été crée !</p>
+    <div class="text-center justify-content-center mt-2">
+      <a routerLink="/mes-paris" class="link-primary">Consulter mes paris</a>
+    </div>
+  </div>
+
+  <form [style.display]="!register && !isPariCreated ? 'block' : 'none'" *ngIf="evenement">
+    <div class="form-group">
+      <label class="control-label">Equipe 1</label>
+      <input #equipe1 type="text" class="form-control" [value]="evenement.equipe1" disabled>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Equipe 2</label>
+      <input type="text" class="form-control" [value]="evenement.equipe2" disabled>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Date</label>
+      <input class="form-control" type="text" [value]="evenement.dateEvenement" disabled>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Type évènement</label>
+      <input class="form-control" type="text" [value]="evenement.nomTypeEvenement" disabled>
+    </div>
+    <div class="form-group">
+      <label class="control-label">Mise</label>
+      <input #montant  step="0.01" class="form-control" type="number" >
+    </div>
+
+    <div class="mt-1 col-lg-7 d-flex">
+      <p class="mx-2">Parier pour : <p>
+      <select name="prediction" id="prediction" [(ngModel)]="prediction" class="form-control">
+        <option value="Equipe1">{{evenement.equipe1 }}=>côte:{{evenement.coteEquipe1}} </option>
+        <option value="Equipe2">{{evenement.equipe2 }}=>côte:{{evenement.coteEquipe2}}</option>
+        <option  value="Nul"> Nul=>côte:{{evenement.coteNul}}</option>
+      </select>
+    </div>
+    <div class="alert alert-danger mt-1" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <button (click)="onSavePari(montant.value)"
+            type="button" class="btn btn-warning mt-1">Je valide</button>
+  </form>
+  <div  *ngIf="register && !isPariCreated" class="text-center justify-content-center mt-2">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Enregistrement ...</p>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+version: '3'
+services:
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: user
+        UID: 501
+    container_name: bet-event-front-app
+    volumes:
+      - .:/var/www/html/dev
+    ports:
+      - "6020:4200"
+    environment:
+      PS1: "[ $$(whoami) | $$(pwd) ] "

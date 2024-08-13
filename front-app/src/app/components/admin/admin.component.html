@@ -1,0 +1,63 @@
+<div class="container">
+  <h1 class="card-title text-center mt-2">Tous les évènements</h1>
+  <div class="text-center m-2">
+    <button routerLink="/ajout-evenement" class="btn btn-warning">Ajouter un évènement
+    </button>
+  </div>
+
+  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button [class.active]="selectedTypeEvenement=== null"  class="nav-link" (click)=resetFilter() id="pills-home-tab-tous" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">Tous</button>
+    </li>
+    <li *ngFor="let typeEvenement of listTypesEvenement" class="nav-item" role="presentation">
+      <button [class.active]="selectedTypeEvenement=== typeEvenement"  class="nav-link" (click)="onFilterByTypeEvenement(typeEvenement)" id="pills-home-tab-{{typeEvenement}}" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">{{typeEvenement}}</button>
+    </li>
+  </ul>
+  <div style="overflow-x:auto;">
+    <table class="table table-striped">
+      <thead class="table-dark" >
+      <tr>
+        <th>Type évènement</th>
+        <th>Equipes</th>
+        <th>Date</th>
+        <th>Heure</th>
+        <th>Nombre de paris</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody *ngIf="selectedEvenement.items.length>0; else loadingEvenements">
+      <tr *ngFor="let evenement of selectedEvenement.items">
+        <td>{{evenement.typeEvenement.nomTypeEvenement}}</td>
+        <td>{{evenement.equipe1}} vs {{evenement.equipe2}}</td>
+        <td>{{evenement.dateEvenement.slice(0,10)}}</td>
+        <td>{{evenement.dateEvenement.slice(11,16)}}</td>
+        <td>{{nbParisByEvenement.get(evenement.idEvenement) ? nbParisByEvenement.get(evenement.idEvenement) : 0}} paris {{evenement.typeResultat===null ? 'en cours':''}}</td>
+        <td>
+          <a routerLink="/resultat/{{evenement.idEvenement}}"  [class]="evenement.typeResultat == null ? 'btn btn-success' :'btn btn-secondary'" >
+            {{ evenement.typeResultat == null ? 'Saisir' : 'Consulter' }} le résultat
+          </a>
+          <a *ngIf="evenement.typeResultat === null" routerLink="/modifier-evenement/{{evenement.idEvenement}}"  class="btn btn-info mx-1" >
+            Modifier
+          </a>
+        </td>
+      </tr>
+      </tbody>
+      <ng-template #loadingEvenements>
+        <tbody class="text-center justify-content-center">
+        <p>Chargement des évènements...</p>
+        <div class="spinner-border text-primary" role="status"></div>
+        </tbody>
+      </ng-template>
+      <tbody *ngIf="selectedEvenement.items.length<=0 && nbParisByEvenement.size<=0 ">
+      <td colspan="6">Pas d'évènements trouvés</td>
+      </tbody>
+    </table>
+
+    <ul *ngIf="selectedEvenement.items.length>0 && evenements.totalPages>1" class="nav nav-pills">
+      <li *ngFor="let item of [].constructor(evenements.totalPages); let page=index">
+        <a [ngClass]="page==currentPage?'btn-info':'btn-outline-info'" (click)="gotoPage(page)" class="btn  ms-1 mt-1">{{page+1}}</a>
+      </li>
+    </ul>
+  </div>
+
+</div>

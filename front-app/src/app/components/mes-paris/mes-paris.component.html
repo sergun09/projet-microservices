@@ -1,0 +1,48 @@
+<div class="container mt-2">
+  <h4 class="text-center">Mes Paris 🤞</h4>
+  <ul *ngIf="selectedParisDTOPage"  class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button [class.active]="selectedTypeEvenement=== null"  class="nav-link" (click)=resetFilter() id="pills-home-tab-tous" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">Tous</button>
+    </li>
+    <li *ngFor="let typeEvenement of listTypesEvenement" class="nav-item" role="presentation">
+      <button  [class.active]="selectedTypeEvenement=== typeEvenement"  class="nav-link" (click)="onFilterByTypeEvenement(typeEvenement)" id="pills-home-tab-{{typeEvenement}}" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">{{typeEvenement}}</button>
+    </li>
+  </ul>
+  <div class="alert alert-danger mt-1" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="selectedParisDTOPage"  class="d-flex flex-wrap justify-content-center align-items-center">
+    <div *ngFor="let pari of selectedParisDTOPage.items" class="card m-1 w-25 text-center">
+      <div class="card-header">
+       Le match de {{pari.evenement?.nomTypeEvenement}}<button class="btn btn-danger btn-sm float-end" (click)="onRemovePari(pari.id)">X</button>
+      </div>
+      <div class="card-body">
+        <h5 id="equipes" class="card-title text-white">{{pari.evenement?.equipe1}} vs {{pari.evenement?.equipe2}}</h5>
+        <h6 class="card-title">le {{pari.evenement?.dateEvenement?.slice(0,10)}}</h6>
+        <h6 class="card-title"><i>À {{pari.evenement?.dateEvenement?.slice(11,16)}}</i></h6>
+        <p class="card-text">Vous pariez pour : <strong>{{pari.prediction == "0" ? "Nul" : pari.prediction == "1" ? "Equipe1" : "Equipe2"}}</strong></p>
+        <p class="card-text">Resultat : <strong>{{pari.evenement?.typeResultat === null ? "En attente" : pari.evenement?.typeResultat}}</strong></p>
+        <a class="btn btn-primary disabled">Mise : {{pari.mise.toFixed(2)}}€</a>
+      </div>
+    </div>
+  </div>
+  <ul *ngIf="ready && selectedParisDTOPage && selectedParisDTOPage.totalPages>1" class="nav nav-pills">
+    <li *ngFor="let item of [].constructor(paris.totalPages); let page=index">
+      <a [ngClass]="page==currentPage?'btn-info':'btn-outline-info'" (click)="gotoPage(page)" class="btn  ms-1 mt-1">{{page}}</a>
+    </li>
+  </ul>
+  <div *ngIf="ready && paris.items.length<=0" class="row">
+    <div class="col-md-12">
+      <div class="alert alert-warning">
+        <strong>Resultat paris en cours</strong>
+        <br>
+        <p>Vous n'avez aucun pari en cours</p>
+      </div>
+    </div>
+  </div>
+
+  <div  *ngIf="!ready" class="text-center justify-content-center mt-2">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Chargement ...</p>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+version: '2'
+
+services:
+  paiement:
+    build:
+      context: .
+      dockerfile: Dockerfile-paiement
+    container_name: paiement
+    depends_on:
+      - discovery
+      - authent
+      - db
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/paiement-postgres
+      - SPRING_DATASOURCE_USERNAME=paiement-postgres
+      - SPRING_DATASOURCE_PASSWORD=paiement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+          -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8084:8084"
+
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=paiement-postgres
+      - POSTGRES_PASSWORD=paiement-postgres
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "9000:8080"
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+
+  discovery:
+    image: consul:1.15
+    ports:
+      - 8500:8500
+
+  authent:
+    build:
+      context: .
+      dockerfile: Dockerfile-authent
+    container_name: authent
+    depends_on:
+      - discovery
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+          -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+    ports:
+      - "8081:8081"

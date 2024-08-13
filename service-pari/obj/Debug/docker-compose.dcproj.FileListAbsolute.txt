@@ -1,0 +1,1 @@
+C:\Users\ergun\Desktop\groupe9-microservices\service-pari\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache

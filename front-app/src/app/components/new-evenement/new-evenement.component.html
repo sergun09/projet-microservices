@@ -1,0 +1,158 @@
+<div class="container">
+  <h1 class="text-center mt-2">Création évènement</h1>
+  <div *ngIf="isEvenementsCreated" class="alert alert-success" role="alert">
+    <p *ngIf="isEvenementsCreated"  class="justify-content-center text-center">L'évènement a bien été crée !</p>
+    <div class="text-center justify-content-center mt-2">
+      <a routerLink="/admin" class="link-primary">Consulter les évènements</a>
+    </div>
+  </div>
+  <form *ngIf="!register && !isEvenementsCreated" class="w-75 mx-auto" [formGroup]="formEvenement" (ngSubmit)="onSaveEvenement()">
+    <div class="form-group mt-2">
+      <input
+              hidden="hidden"
+              type="url"
+              formControlName="typeResultat"
+              class="form-control"
+              [class.is-invalid]="submitted && typeResultat?.errors"
+      />
+    </div>
+
+    <div class="form-group mt-2">
+      <input  hidden="hidden"
+              type="url"
+              formControlName="idEvenement"
+              class="form-control"
+              [class.is-invalid]="submitted && idEvenement?.errors"
+      />
+    </div>
+
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="equipe1"
+              class="form-control"
+              placeholder="equipe 1"
+              [class.is-invalid]="submitted && equipe1?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && equipe1?.errors">
+        <div *ngIf="equipe1?.getError('required')">Veuillez saisir le nom de l'équipe 1 !</div>
+        <div *ngIf="equipe1?.getError('minlength')">3 caractères minimum requis !</div>
+        {{ equipe1?.getError("violation") }}
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="equipe2"
+              class="form-control"
+              placeholder="equipe 2"
+              [class.is-invalid]="submitted && equipe2?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && equipe2?.errors">
+        <div *ngIf="equipe2?.getError('required')">Veuillez saisir le nom de l'équipe 2 !</div>
+        <div *ngIf="equipe2?.getError('minlength')">3 caractères minimum requis !</div>
+        {{ equipe2?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <input
+              type="datetime-local"
+              formControlName="dateEvenement"
+              class="form-control"
+              placeholder="date de l'évènement"
+              [class.is-invalid]="submitted && dateEvenement?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && dateEvenement?.errors">
+        <div *ngIf="dateEvenement?.getError('required')">Veuillez saisir la date de l'évènement !</div>
+        {{ dateEvenement?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <select formControlName="nomTypeEvenement"
+              [class.is-invalid]="submitted && nomTypeEvenement?.errors"
+              class="form-control">
+        <option *ngFor="let categorie of listeCategories " [value]="categorie">
+          {{ categorie }}</option>
+      </select>
+      <div class="invalid-feedback"  *ngIf="submitted && nomTypeEvenement?.errors">
+        <div *ngIf="nomTypeEvenement?.getError('required')">Veuillez saisir le type de l'évènement !</div>
+        {{ nomTypeEvenement?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="ville"
+              class="form-control"
+              placeholder="lieu de l'évènement"
+              [class.is-invalid]="submitted && ville?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && ville?.errors">
+        <div *ngIf="ville?.getError('required')">Veuillez saisir le lieu de l'évènement !</div>
+        <div *ngIf="ville?.getError('minlength')">3 caractères minimum requis !</div>
+        {{ ville?.getError("violation") }}
+      </div>
+    </div>
+
+
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="coteEquipe1"
+              class="form-control"
+              placeholder="côte pour l'équipe n°1"
+              [class.is-invalid]="submitted && coteEquipe1?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && coteEquipe1?.errors">
+        <div *ngIf="coteEquipe1?.getError('required')">Veuillez saisir la côte pour l'éauipe n°1</div>
+        {{ coteEquipe1?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="coteEquipe2"
+              class="form-control"
+              placeholder="côte pour l'équipe n°2"
+              [class.is-invalid]="submitted && coteEquipe2?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && coteEquipe2?.errors">
+        <div *ngIf="coteEquipe2?.getError('required')">Veuillez saisir la côte pour l'éauipe n°2</div>
+        {{ coteEquipe2?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="coteNul"
+              class="form-control"
+              placeholder="côte pour un resultat à nul"
+              [class.is-invalid]="submitted && coteNul?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && coteNul?.errors">
+        <div *ngIf="coteNul?.getError('required')">Veuillez saisir la côte en cas de resultat nul</div>
+        {{ coteNul?.getError("violation") }}
+      </div>
+    </div>
+
+    <div class="alert alert-danger" *ngIf="errorMessage">
+      Une erreur de type inconnue est survenue
+    </div>
+
+    <div class="alert alert-danger mt-1" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+    <button type="submit" class="btn btn-warning mt-1">créer évènement</button>
+  </form>
+
+  <div  *ngIf="register && !isEvenementsCreated" class="text-center justify-content-center mt-2">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Enregistrement ...</p>
+  </div>
+
+</div>

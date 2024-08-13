@@ -1,0 +1,29 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: service-evenement
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        register: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: guest
+    password: guest
+    exchange-evenement: evenement.nouveau
+    queue-evenement: evenement.nouveau
+    routingkey-evenement: evenement.nouveau
+
+    exchange-evenement2: evenement.resultat
+    queue-evenement2: evenement.resultat
+    routingkey-evenement2: evenement.resultat
+
+    exchange-evenement3: evenement.supprime
+    queue-evenement3: evenement.supprime
+    routingkey-evenement3: evenement.supprime
+

@@ -1,0 +1,37 @@
+<div class="container">
+    <h1 class="card-title text-center mt-2">Toutes les notifications</h1>
+
+    <div style="overflow-x:auto;">
+        <table class="table">
+            <thead class="table-dark" >
+            <tr>
+                <th>Objet</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody *ngIf="notifications; else loadingNotifications">
+            <tr *ngFor="let notif of notifications.items">
+                <td>{{notif.typeNotification}}</td>
+                <td>
+                    <button type="button" class="btn text-white btn-success mx-1" (click)="openNotification(notif)">Ouvrir</button>
+                </td>
+            </tr>
+            </tbody>
+            <ng-template #loadingNotifications>
+                <tbody class="text-center justify-content-center">
+                <p>Chargement des notifications...</p>
+                <div class="spinner-border text-primary" role="status"></div>
+                </tbody>
+            </ng-template>
+            <tbody *ngIf="notifications">
+                <td *ngIf="notifications.items.length<=0" colspan="6">Pas de notifications trouvés</td>
+            </tbody>
+        </table>
+        <ul *ngIf="notifications.items.length>0 && notifications.totalPages>1" class="nav nav-pills">
+            <li *ngFor="let item of [].constructor(notifications.totalPages); let page=index">
+                <a [ngClass]="page==currentPage?'btn-info':'btn-outline-info'" (click)="gotoPage(page)" class="btn  ms-1 mt-1">{{page+1}}</a>
+            </li>
+        </ul>
+    </div>
+
+</div>

@@ -1,0 +1,134 @@
+GET http://localhost:8084/actuator/health
+
+### Inscription d'un nouvel utilisateur
+POST http://localhost:8081/authentification/inscriptions
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "nizare@test.com",
+  "nom":  "nizar",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizar"
+}
+
+> {%
+    client.global.set("uriUser1", response.headers.valueOf("Location"));
+    client.global.set("tokenUser1", response.headers.valueOf("Authorization"));
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Utilisateur non crée");
+    });
+%}
+
+###Connexion d'un Utilisateur
+POST http://localhost:8081/authentification/login
+Content-Type: application/json
+
+{
+  "email": "nizare@test.com",
+  "mdpUtilisateur": "nizar"
+}
+
+> {%
+    client.global.set("tokenUtilisateur", response.headers.valueOf("Authorization"));
+%}
+### Connexion d'un admin
+POST http://localhost:8081/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+###
+GET http://localhost:8084/paiement/test
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8084/paiement/test/admin
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8084/paiement/test/infos
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+### Retourner un compte à partir d'un idUtilisateur
+GET http://localhost:8084/paiement/comptes/utilisateurs/3
+Authorization: {{tokenUtilisateur}}
+
+### Payer un pari
+POST http://localhost:8084/paiement/reglements
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUtilisateur}}
+
+{
+  "idPari": 456,
+  "montant": 100.00
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Paiement accepte");
+    });
+%}
+
+
+### Solde insuffisant pour payer un pari
+POST http://localhost:8084/paiement/reglements
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUtilisateur}}
+
+{
+  "idPari": 456,
+  "montant": 100000.00
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Solde insuffisant");
+    });
+%}
+
+### Verser de l'argent sur un compte parieur
+POST http://localhost:8084/paiement/versements
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUtilisateur}}
+
+{
+  "typeTransaction": "CB_COMPTE_PARIEUR",
+  "idCompte": 3 ,
+  "montant": 50000.00,
+  "numCarte": 1234567890,
+  "dateExpiration": "10/09",
+  "cvv": 123
+}
+
+### Verser de l'argent sur la carte bancaire
+POST http://localhost:8084/paiement/versements
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUtilisateur}}
+
+{
+  "typeTransaction": "COMPTE_PARIEUR_CB",
+  "idCompte": 789,
+  "montant": 50.00,
+  "numCarte": 1234567890,
+  "dateExpiration": "10/09",
+  "cvv": 123
+}
+
+
+
+

@@ -1,0 +1,74 @@
+### Création d'une Notification 1
+POST http://localhost:8080/api/notifications
+Content-Type: application/json
+Accept: application/json
+
+{
+  "idUtilisateur": "1",
+  "description": "Utilisateur 1 s'est inscrit",
+  "typeNotification": "INSCRIPTION"
+}
+
+> {%
+    client.global.set("uriNotif1", response.headers.valueOf("Location").split('5/')[1]);
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Notification créée");
+    });
+%}
+
+### Récupération Notification 1
+GET http://localhost:8080/api/{{uriNotif1}}
+Accept: application/json
+
+### Création d'une Notification 2
+POST http://localhost:8080/api/notifications
+Content-Type: application/json
+Accept: application/json
+
+{
+  "idUtilisateur": "1",
+  "description": "Utilisateur 1 a ajouté de l'argent sur son compte",
+  "typeNotification": "AJOUT_ARGENT"
+}
+
+> {%
+    client.global.set("uriNotif2",  response.headers.valueOf("Location").split('5/')[1]);
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Notification créée");
+    });
+%}
+
+### Récupération de toutes les Notification d'un user
+GET http://localhost:8080/api/notifications/utilisateur/3
+Authorization:{{tokenAdmin}}
+Accept: application/json
+
+###TEST Security
+
+### Connexion d'un admin
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+###
+GET http://localhost:8080/api/notifications/test
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8080/api/notifications/test/admin
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+###
+GET http://localhost:8080/api/notifications/test/infos
+Authorization: {{tokenAdmin}}
+Accept: application/json

@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <h4 class="modal-title"><b>Objet : </b>{{notification.typeNotification}}</h4>
+</div>
+<div class="modal-body">
+    <div class="card lesson-border">
+        <div class="card-body">
+            <p class="card-text">{{notification.description}}</p>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Fermer</button>
+</div>

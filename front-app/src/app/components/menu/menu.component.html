@@ -1,0 +1,24 @@
+<nav class="navbar navbar-expand-lg navbar-light p-lg-3" style="background-color: #e3f2fd;">
+  <div class="collapse navbar-collapse" id="navbarColor03">
+    <ul class="navbar-nav me-auto">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/">Bet-event🏀⚽️🏈🎾</a>
+      </li>
+      <li *ngIf="estConnecte" routerLinkActive="active" id="nav-mes-paris" class="nav-item">
+        <a class="nav-link link-dark" routerLink="/mes-paris">Mes paris</a>
+      </li>
+      <li  *ngIf="estConnecte"  routerLinkActive="active" id="nav-mes-notifications" class="nav-item">
+        <a class="nav-link link-dark"  routerLink="/mes-notifications">Mes notifications</a>
+      </li>
+      <li  *ngIf="estConnecte"  routerLinkActive="active" id="nav-mon-compte"  class="nav-item">
+        <a class="nav-link link-dark" routerLink="/mon-compte">Mon compte</a>
+      </li>
+      <li *ngIf="estConnecte && estAdmin" routerLinkActive="active" id="nav-admin" class="nav-item">
+        <a class="nav-link link-dark"  routerLink="/admin">Espace admin</a>
+      </li>
+    </ul>
+    <a *ngIf="estConnecte" class="nav-link mx-2 disabled"> {{nomPrenomUtilisateur}}</a>
+    <a *ngIf="!estConnecte" class="btn btn-warning ms-1" routerLink="/connexion">Connexion</a>
+    <a *ngIf="estConnecte" class="btn btn-danger ms-1" (click) = "handleLogout()">Deconnexion</a>
+  </div>
+</nav>

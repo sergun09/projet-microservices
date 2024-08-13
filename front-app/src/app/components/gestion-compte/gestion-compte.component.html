@@ -1,0 +1,101 @@
+<div class="container mt-2">
+    <div *ngIf="!isVersement" class="alert alert-success" role="alert">
+        <p class="justify-content-center text-center">Solde : +{{compte.solde}} </p>
+    </div>
+
+    <div *ngIf="isVersement" class="alert alert-success" role="alert">
+        <p *ngIf="isVersement"  class="justify-content-center text-center">L'opération a bien été pris en compte</p>
+        <div class="text-center justify-content-center mt-2">
+            <a (click)="rechergerPage()" class="link-primary">Consulter mon compte</a>
+        </div>
+    </div>
+
+    <div *ngIf="!isVersement" class="card">
+        <div class="card-header align-content-center">
+            <h2 class="text-center">Effectuer un versement</h2>
+            <ul class="nav nav-tabs card-header-tabs">
+                <li *ngFor="let typeTransaction of listeTypeTransaction" class="nav-item" role="presentation">
+                    <button [class.active]="selectedTypeTransaction===typeTransaction" class="nav-link" (click)="onFilterByTypeTransaction(typeTransaction)" id="pills-home-tab-{{typeTransaction}}" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home">{{typeTransaction}}</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <form class="w-75 mx-auto" [formGroup]="form" (ngSubmit)="handleSubmit()">
+                <div class="form-group">
+                    <input
+                            type="url"
+                            hidden="hidden"
+                            formControlName="typeTransation"
+                            class="form-control"
+                    />
+                </div>
+                <div class="form-group">
+                    <input
+                            type="url"
+                            hidden="hidden"
+                            formControlName="idCompte"
+                            class="form-control"
+                    />
+                </div>
+                <div class="form-group">
+                    <input
+                            type="number"
+                            formControlName="numCarte"
+                            class="form-control"
+                            placeholder="numéro de carte"
+                            [class.is-invalid]="submitted && numCarte?.errors"
+                    />
+                    <div class="invalid-feedback"  *ngIf="submitted && numCarte?.errors">
+                        <div *ngIf="numCarte?.getError('required')">Veuillez saisir votre numéro de carte !</div>
+                        <div *ngIf="numCarte?.getError('minlength')">16 chiffres requis !</div>
+                        {{ numCarte?.getError("violation") }}
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <input
+                            type="url"
+                            formControlName="dateExpiration"
+                            class="form-control"
+                            placeholder="date d'éxpiration"
+                            [class.is-invalid]="submitted && dateExpiration?.errors"
+                    />
+                    <div class="invalid-feedback"  *ngIf="submitted && dateExpiration?.errors">
+                        <div *ngIf="dateExpiration?.getError('required')">Veuillez la date d'éxpiration de votre carte !</div>
+                        {{ dateExpiration?.getError("violation") }}
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <input
+                            type="number"
+                            formControlName="cvv"
+                            class="form-control"
+                            placeholder="cvv"
+                            [class.is-invalid]="submitted && cvv?.errors"
+                    />
+                    <div class="invalid-feedback"  *ngIf="submitted && cvv?.errors">
+                        <div *ngIf="cvv?.getError('required')">Veuillez saisir le cvv !</div>
+                        <div *ngIf="cvv?.getError('minlength')">3 caractères requis !</div>
+                        {{ cvv?.getError("violation") }}
+                    </div>
+                </div>
+                <div class="form-group mt-2">
+                    <input
+                            type="url"
+                            formControlName="montant"
+                            class="form-control"
+                            placeholder="Montant"
+                            [class.is-invalid]="submitted && montant?.errors"
+                    />
+                    <div class="invalid-feedback"  *ngIf="submitted && montant?.errors">
+                        <div *ngIf="montant?.getError('required')">Veuillez saisir un montant !</div>
+                        {{ montant?.getError("violation") }}
+                    </div>
+                </div>
+                <div class="alert alert-danger" *ngIf="error">
+                    Une erreur de type inconnue est survenue
+                </div>
+                <button type="submit" class="btn btn-warning mt-1">Valider</button>
+            </form>
+        </div>
+    </div>
+</div>

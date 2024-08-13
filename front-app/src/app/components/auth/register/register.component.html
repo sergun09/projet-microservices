@@ -1,0 +1,78 @@
+<script src="register.component.ts"></script>
+<div class="container">
+  <h2 class="text-center mt-3">Créer un compte</h2>
+  <form class="w-75 mx-auto" [formGroup]="form" (ngSubmit)="handleSubmit()">
+    <div class="form-group">
+      <input
+        type="url"
+        formControlName="email"
+        class="form-control"
+        placeholder="email"
+        [class.is-invalid]="submitted && email?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && email?.errors">
+        <div *ngIf="email?.getError('required')">Veuillez saisir votre email !</div>
+        <div *ngIf="email?.getError('email')">Email au format invalide !</div>
+        {{ email?.getError("violation") }}
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="nom"
+              class="form-control"
+              placeholder="nom"
+              [class.is-invalid]="submitted && nom?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && nom?.errors">
+        <div *ngIf="nom?.getError('required')">Veuillez saisir votre nom !</div>
+        <div *ngIf="nom?.getError('minlength')">3 caractères minimum requis !</div>
+        {{ nom?.getError("violation") }}
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <input
+              type="url"
+              formControlName="prenom"
+              class="form-control"
+              placeholder="prenom"
+              [class.is-invalid]="submitted && prenom?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && prenom?.errors">
+        <div *ngIf="prenom?.getError('required')">Veuillez saisir votre prenom !</div>
+        <div *ngIf="prenom?.getError('minlength')">3 caractères minimum requis !</div>
+        {{ prenom?.getError("violation") }}
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <input
+        type="password"
+        formControlName="mdpUtilisateur"
+        class="form-control"
+        placeholder="Mot de passe"
+        [class.is-invalid]="submitted && mdpUtilisateur?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && mdpUtilisateur?.errors">
+        <div *ngIf="mdpUtilisateur?.getError('required')">Veuillez saisir un mot de passe !</div>
+        <div *ngIf="mdpUtilisateur?.getError('minlength')">4 caractères minimum requis !</div>
+        {{ mdpUtilisateur?.getError("violation") }}
+      </div>
+    </div>
+    <div class="form-group mt-2">
+      <input
+        type="plainPassword"
+        formControlName="plainPassword"
+        class="form-control"
+        placeholder="Confirmation du mot de passe"
+        [class.is-invalid]="submitted && plainPassword?.errors"
+      />
+      <div class="invalid-feedback"  *ngIf="submitted && plainPassword?.errors">
+        {{ plainPassword?.getError("violation") }}
+      </div>
+    </div>
+    <div class="alert alert-danger mt-1 sm" *ngIf="errorMessages.length>0">
+      <p *ngFor="let errorMessage of errorMessages">{{errorMessage}}</p>
+    </div>
+    <button type="submit" class="btn btn-warning mt-1">Inscription</button>
+  </form>
+</div>

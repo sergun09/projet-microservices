@@ -1,0 +1,319 @@
+GET http://localhost:8500/v1/kv/config/application/publicKey
+Accept: application/json
+
+###
+GET http://localhost:8081/actuator/health
+
+### Inscription d'un nouvel utilisateur
+POST http://localhost:8080/api/authentification/inscriptions
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "niz@test.com",
+  "nom":  "nizar",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizar"
+}
+
+> {%
+    client.global.set("uriUser1", response.headers.valueOf("Location").split('1/')[1]);
+    client.global.set("tokenUser1", response.headers.valueOf("Authorization"));
+
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Utilisateur non crée");
+    });
+%}
+
+### Inscription d'un utilisateur avec un email au format invalide
+POST http://localhost:8080/api/authentification/inscriptions
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "nizar",
+  "nom":  "nizar",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizar"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "utilisateur avec email invalide");
+    });
+%}
+
+
+### Inscription d'un utilisateur avec email existant
+POST http://localhost:8080/api/authentification/inscriptions
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "nizare@test.com",
+  "nom":  "nizar",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizar"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 409, "Utilisateur avec un email dèjà existant");
+    });
+%}
+
+### utilisateur consulte ses infos
+GET http://localhost:8080/api/{{uriUser1}}
+Accept: application/json
+Authorization: {{tokenUser1}}
+
+### Connexion d'un utilisateur
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "u1@test.com",
+  "mdpUtilisateur": "user1"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Utilisateur non connecté");
+    });
+%}
+
+### Connexion avec un mot de passe non valide
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "u1@test.com",
+  "mdpUtilisateur": "user167867"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 403, "Mdp non valides");
+    });
+%}
+
+### Connexion avec un email non valide
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "u1@testTyy.com",
+  "mdpUtilisateur": "user1"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "email non valides");
+    });
+%}
+
+### Connexion d'un admin
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+### Consultation des utilisateurs inscrits par un admin avec une affichage par pagination
+GET http://localhost:8080/api/authentification/inscriptions?page=0&size=3
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+### Consultation des utilisateurs inscrits par un utilisateur (accès refusé)
+GET http://localhost:8080/api/authentification/inscriptions
+Accept: application/json
+Authorization: {{tokenUser1}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 401, "ROLE_USER non autorisé ");
+    });
+%}
+
+### Un Utilisateur consulte les infos d'un autre
+GET  http://localhost:8080/api/authentification/inscriptions/1
+Accept: application/json
+Authorization: {{tokenUser1}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 403, "Un Utilisateur consulte les infos d'un autre");
+    });
+%}
+
+### Un admin consulte les infos d'un autre utilisateur
+GET  http://localhost:8080/api/authentification/inscriptions/3
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Un admin ne peut pas consulter les infos d'un autre utilisateur");
+    });
+%}
+
+### Consulatation d'un utilisateur inexistant par un admin
+GET http://localhost:8080/api/authentification/inscriptions/34
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Utilisateur non existant");
+    });
+%}
+
+### Un utilisateur modifie son profil
+PUT http://localhost:8080/api/authentification/inscriptions/3
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUser1}}
+
+{
+  "email": "nizarUpdate@test.com",
+  "nom":  "nizarupdate",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Profile utilisateur modifié");
+    });
+%}
+
+### Connexion d'un utilisateur après modification de son profil
+POST http://localhost:8081/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "nizarUpdate@test.com",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Utilisateur non connecté");
+    });
+%}
+
+### Un admin modifie le profil d'un utilisateur
+PUT http://localhost:8081/api/authentification/inscriptions/3
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "email": "nizarUpdate2@test.com",
+  "nom":  "nizarupdate",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Un admin n'a pas pu modifié le profile d'utilisateur");
+    });
+%}
+
+### Un admin modifie le profil d'un utilisateur mais avec un email au format invalide
+PUT http://localhost:8080/api/authentification/inscriptions/3
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "email": "nizarUpdate2",
+  "nom":  "nizarupdate",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Un admin a pu modifié le profile d'utilisateur avec un email invalide");
+    });
+%}
+
+### Un admin modifie le profil d'un utilisateur mais avec un email qui est déjà pris
+PUT http://localhost:8080/api/authentification/inscriptions/3
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "email": "admin@test.com",
+  "nom":  "nizarupdate",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 409, "Un admin a pu modifié le profile d'utilisateur avec un email déjà pris");
+    });
+%}
+
+### Un admin modifie le profil d'un utilisateur qui n'existe pas
+PUT http://localhost:8080/api/authentification/inscriptions/34
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "email": "toto@gmail.com",
+  "nom":  "nizarupdate",
+  "prenom": "chad",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Un admin a pu modifié le profile d'utilisateur qui n'existe pas");
+    });
+%}
+
+### Connexion d'un utilisateur après modification de son profil par un admin
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "nizarUpdate2@test.com",
+  "mdpUtilisateur": "nizarUp"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Utilisateur non connecté");
+    });
+%}
+
+### Un utilisateur modifie le profil d'un autre utilisateur
+PUT http://localhost:8080/api/authentification/inscriptions/1
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenUser1}}
+
+{
+  "email": "user11@test.com",
+  "nom":  "user111",
+  "prenom": "user111",
+  "mdpUtilisateur": "user111"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 403, "Un utilisateur modifie le profil d'un autre utilisateur");
+    });
+%}

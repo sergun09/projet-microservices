@@ -1,0 +1,32 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: service-notification
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        register: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: guest
+    password: guest
+    exchange-inscription: utilisateur.nouveau
+    queue-inscription: utilisateur.nouveau
+    routingkey-inscription: utilisateur.nouveau
+
+    exchange-paiement-nouveau: paiement.nouveau
+    queue-paiement-nouveau: paiement.nouveau
+    routingkey-paiement-nouveau: paiement.nouveau
+
+    exchange-pari-gagne: pari.gagne
+    queue-pari-gagne: pari.gagne.notification.confirmation
+    routingkey-pari-gagne: pari.gagne
+
+    exchange-pari-annule: pari.annule
+    queue-pari-annule: pari.annule.notification.confirmation
+    routingkey-pari-annule: pari.annule

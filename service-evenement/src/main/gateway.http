@@ -1,0 +1,110 @@
+GET http://localhost:8083/actuator/health
+
+### Connexion d'un admin
+POST http://localhost:8080/api/authentification/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "mdpUtilisateur": "admin"
+}
+
+> {%
+    client.global.set("tokenAdmin", response.headers.valueOf("Authorization"));
+%}
+
+### Création d'un nouvel evenement sportif
+POST http://localhost:8080/api/evenement
+Content-Type: application/json
+Authorization: {{tokenAdmin}}
+Accept: application/json
+
+{
+  "nomTypeEvenement": "Foot",
+  "equipe1": "PSG",
+  "equipe2": "Juventus",
+  "dateEvenement": "2012-04-23T18:25:43.511Z",
+  "ville": "Barcelona",
+  "coteEquipe1": 2.0,
+  "coteEquipe2": 1.5,
+  "coteNul": 1
+}
+
+> {%
+    client.global.set("urlEvenementSportif", response.headers.valueOf("Location").split('0/')[1]);
+    //console.log(response.headers.valueOf("Location"))
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Evenement sportif bien crée");
+    });
+%}
+
+### Get un evenement sportif
+GET http://localhost:8080/api/{{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Modification faite");
+    });
+%}
+
+### Supprimer un evenement sportif
+DELETE http://localhost:8080/api/{{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Suppression faite");
+    });
+%}
+
+### Modifier un evenement sportif
+PATCH http://localhost:8080/api/{{urlEvenementSportif}}
+Content-Type: application/json
+Accept: application/json
+Authorization: {{tokenAdmin}}
+
+{
+  "nomTypeEvenement": "Foot",
+  "equipe1": "Real",
+  "equipe2": "Barca",
+  "dateEvenement": "2012-04-23T18:25:43.511Z",
+  "ville": "Barcelona",
+  "coteEquipe1": 2.0,
+  "coteEquipe2": 1.5,
+  "coteNul": 1
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Modification faite");
+    });
+%}
+
+### Modifier le résultat d'un evenement sportif
+PATCH http://localhost:8080/api/evenement/5/resultat
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJhZG1pbkB0ZXN0LmNvbSIsInJvbGVzIjpbIlJPTEVfVVNFUiIsIlJPTEVfQURNSU4iXSwiaXNzIjoic2VsZiIsImlkVXRpbGlzYXRldXIiOjIsImV4cCI6MTcxMzMzMzEwMCwiaWF0IjoxNzEzMjk3MTAwLCJwcmVub20iOiJwcmVub20gYWRtaW4iLCJub20iOiJhZG1pbiJ9.pZPeeRUSJ7Cd9fE4E4yOB7HVVV1CQZoJF7Lzi5wJbpiI8YTUjBAbfYiNItw7b9xbR9Wh56RTDMot2udwxkHxflEUTiFBwlm6p6F1M_asNu4Zo03RpWFXX26Xo8wWbTdtoPTA51El5Ea--jzhQd6yn2mKjx33T6RVMAY-DBAY4dbyRbqLNIGgPoT73ProG-euZbpPWz8qQ4o8mQKx1FBd7JIudYPxZFiCdVtAqOEm8LaXDVMC6nEheBGOuP4Y8QCUnLDMFELoJrNLK9ZBf4z54k5UCIqo40RW4RmuvdjDWKFJHgpBrAryTSW01RLwpD02uXsFYwCuE6QuYPnHHMCJag
+
+{
+  "typeResultat": "Equipe2"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Modification faite");
+    });
+%}
+
+
+### Consultation des evenements sportifs par pagination
+GET http://localhost:8080/api/evenement?page=0&size=3
+Accept: application/json
+Authorization: {{tokenAdmin}}

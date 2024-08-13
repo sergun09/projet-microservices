@@ -1,0 +1,167 @@
+version: '3.9'
+
+services:
+  authent:
+    image: sinanzzz/service-authent:1.0
+    container_name: service-authentification
+    restart: always
+    depends_on:
+      - discovery
+      - db-authent
+      - rabbitmq
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-authent:5432/authent-postgres
+      - SPRING_DATASOURCE_USERNAME=authent-postgres
+      - SPRING_DATASOURCE_PASSWORD=authent-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+
+  db-authent:
+    image: 'postgres:13.1-alpine'
+    container_name: db-authent
+    environment:
+      - POSTGRES_USER=authent-postgres
+      - POSTGRES_PASSWORD=authent-postgres
+
+  notif:
+    image: sinanzzz/service-notif:1.0
+    container_name: service-notification
+    restart: always
+    depends_on:
+      - authent
+      - db-notif
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-notif:5432/notif-postgres
+      - SPRING_DATASOURCE_USERNAME=notif-postgres
+      - SPRING_DATASOURCE_PASSWORD=notif-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+
+  db-notif:
+    image: 'postgres:13.1-alpine'
+    container_name: db-notif
+    environment:
+      - POSTGRES_USER=notif-postgres
+      - POSTGRES_PASSWORD=notif-postgres
+
+  evenement:
+    image: sinanzzz/service-evenement:1.0
+    container_name: service-evenement
+    restart: always
+    depends_on:
+      - authent
+      - db-evenement
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-evenement:5432/evenement-postgres
+      - SPRING_DATASOURCE_USERNAME=evenement-postgres
+      - SPRING_DATASOURCE_PASSWORD=evenement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovsery
+      - CONSUL_PORT=8500
+
+  db-evenement:
+    image: 'postgres:13.1-alpine'
+    container_name: db-evenement
+    environment:
+      - POSTGRES_USER=evenement-postgres
+      - POSTGRES_PASSWORD=evenement-postgres
+
+  paiement:
+    image: sinanzzz/service-paiement:1.0
+    container_name: service-paiement
+    restart: always
+    depends_on:
+      - authent
+      - db-evenement
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-paiement:5432/paiement-postgres
+      - SPRING_DATASOURCE_USERNAME=paiement-postgres
+      - SPRING_DATASOURCE_PASSWORD=paiement-postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - DEBUG=true
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+
+  db-paiement:
+    image: 'postgres:13.1-alpine'
+    container_name: db-paiement
+    environment:
+      - POSTGRES_USER=paiement-postgres
+      - POSTGRES_PASSWORD=paiement-postgres
+
+  service-pari:
+    image: sinanzzz/service-pari:1.0
+    container_name: service-pari-api
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8082
+    depends_on:
+      - evenement
+
+  service-pari-database:
+    image: postgres:13.1-alpine
+    container_name: service-pari-database
+    environment:
+      - POSTGRES_DB=Bet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  service-gateway:
+    image: sinanzzz/gateway:1.0
+    container_name: service-gateway
+    ports:
+      - 8080:8080
+    environment:
+      - JAVA_TOOL_OPTIONS=
+        -DCONSUL_HOST=discovery -DCONSUL_PORT=8500
+      - CONSUL_HOST=discovery
+      - CONSUL_PORT=8500
+      - DEBUG=true
+    depends_on:
+      - discovery
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASSWORD: guest
+
+  discovery:
+    container_name: discovery
+    image: consul:1.15
+    ports:
+      - 8500:8500
+
+  front-app:
+    image: sinanzzz/front-pari:1.0
+    container_name: front-app
+    ports:
+      - '6020:80'
+    expose:
+      - '6020'
